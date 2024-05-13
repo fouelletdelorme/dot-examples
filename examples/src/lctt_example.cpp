@@ -423,7 +423,11 @@ int main() {
 #endif
 
     dot->setJoinNonceValidation(true);
+ 
+    // LCTT starts OTAA tests with AppNonce 1, resetting the AppNonce is needed to pass LCTT 3.12.0 and before
+    // If LCTT test are changed to test AppNonce loaded from NVM this can be removed to pass
     dot->setAppNonce(0);
+ 
     dot->setLinkCheckThreshold(0);
     dot->setLinkCheckCount(0);
     dot->setFrequencySubBand(0); // US915/AU915 8 channel test, set to 0 for 64 channel tests
