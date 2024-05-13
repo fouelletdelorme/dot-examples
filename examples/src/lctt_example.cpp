@@ -27,7 +27,7 @@ static std::string network_name = "MultiTech";
 static std::string network_passphrase = "MultiTech";
 static uint8_t network_id[] = { 0x6C, 0x4E, 0xEF, 0x66, 0xF4, 0x79, 0x86, 0xA6 };
 static uint8_t network_key[] = { 0x1F, 0x33, 0xA1, 0x70, 0xA5, 0xF1, 0xFD, 0xA0, 0xAB, 0x69, 0x7A, 0xAE, 0x2B, 0x95, 0x91, 0x6B };
-static uint8_t frequency_sub_band = 1;
+static uint8_t frequency_sub_band = 0;
 static lora::NetworkType network_type = lora::PUBLIC_LORAWAN;
 static uint8_t join_delay = 5;
 static uint8_t ack = 0;
@@ -379,10 +379,6 @@ int main() {
 
     pc.baud(115200);
 
-#if defined(TARGET_XDOT_L151CC)
-    i2c.frequency(400000);
-#endif
-
     mts::MTSLog::setLogLevel(mts::MTSLog::TRACE_LEVEL);
 
     // Create channel plan
@@ -417,17 +413,20 @@ int main() {
 
     dot->setTestModeEnabled(true);
 
+#if MBED_VERSION == MBED_ENCODE_VERSION(6, 8, 0)
+ 
+    // For library 4.1.x use Test.DisableADRIncrementDatarate
+    dot->getSettings()->Test.DisableADRIncrementDatarate = true;
+#else
     // For library 4.2.x use setDisableIncrementDR
     dot->setDisableIncrementDR(true);
-
-    // For library 4.1.x use Test.DisableADRIncrementDatarate
-    // dot->getSettings()->Test.DisableADRIncrementDatarate = true;
-
+#endif
 
     dot->setJoinNonceValidation(true);
+    dot->setAppNonce(0);
     dot->setLinkCheckThreshold(0);
     dot->setLinkCheckCount(0);
-    dot->setFrequencySubBand(1); // US915/AU915 8 channel test, set to 0 for 64 channel tests
+    dot->setFrequencySubBand(0); // US915/AU915 8 channel test, set to 0 for 64 channel tests
     dot->setAck(0);
     dot->setAdr(true);
     dot->setAppPort(224);
